@@ -103,6 +103,32 @@ Admin Panel
 <div style="text-align:center;padding:30px;font-size:14px;color:#6b7280">
 © 2025 Boost Your Social Media Worldwide | English | සිංහල
 </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const ADMIN_EMAIL = "admin@boostsocial.com";
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (user.email === ADMIN_EMAIL) {
+      document.getElementById("adminBtn").style.display = "inline-block";
+    }
+  });
+</script>
 
 </body>
 </html>

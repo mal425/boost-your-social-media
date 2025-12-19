@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaigns | Boost Social</title>
+
+<style>
+body{
+  margin:0;font-family:Segoe UI,Tahoma,sans-serif;
+  background:#f5f7fb
+}
+.container{
+  max-width:1100px;margin:auto;padding:30px
+}
+.card{
+  background:#fff;padding:25px;
+  border-radius:16px;margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08)
+}
+.badge{
+  display:inline-block;
+  padding:6px 14px;
+  background:#eef2ff;color:#4338ca;
+  border-radius:20px;font-size:13px
+}
+.btn{
+  display:inline-block;margin-top:10px;
+  padding:10px 22px;border-radius:30px;
+  background:linear-gradient(135deg,#4f46e5,#9333ea);
+  color:#fff;text-decoration:none;font-weight:600
+}
+small{color:#6b7280}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Available Campaigns</h2>
+
+  <div id="campaignList"></div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore,
+    collection,
+    query,
+    orderBy,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 🔥 YOUR FIREBASE CONFIG
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const list = document.getElementById("campaignList");
+
+  // 🔐 AUTH GUARD
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    loadCampaigns();
+  });
+
+  // 📥 LOAD CAMPAIGNS
+  function loadCampaigns(){
+    const q = query(
+      collection(db, "campaigns"),
+      orderBy("createdAt", "desc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+      list.innerHTML = "";
+
+      if (snapshot.empty) {
+        list.innerHTML = "<p>No campaigns available.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const c = doc.data();
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+          <span class="badge">${c.platform}</span>
+          <h3>${c.campaignType}</h3>
+
+          <p>
+            Screenshot required:
+            <strong>${c.screenshotRequired ? "Yes" : "No"}</strong>
+          </p>
+
+          <small>Created by: ${c.createdByEmail}</small><br>
+
+          <a class="btn" href="${c.socialLink}" target="_blank">
+            Open & Complete Task
+          </a>
+        `;
+
+        list.appendChild(div);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

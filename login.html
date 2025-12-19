@@ -53,8 +53,8 @@ button.outline{
   <input type="email" id="email" placeholder="Email address">
   <input type="password" id="password" placeholder="Password">
 
-  <button onclick="login()">Login</button>
-  <button class="outline" onclick="register()">Register</button>
+  <button id="loginBtn">Login</button>
+  <button class="outline" id="registerBtn">Register</button>
 
   <div class="msg" id="msg"></div>
 </div>
@@ -77,31 +77,48 @@ button.outline{
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
   const msg = document.getElementById("msg");
 
+  document.getElementById("loginBtn").addEventListener("click", login);
+  document.getElementById("registerBtn").addEventListener("click", register);
+
   // LOGIN
-  window.login = function () {
-    const email = email.value;
-    const password = password.value;
+  function login() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      msg.style.color = "red";
+      msg.innerText = "Please enter email and password";
+      return;
+    }
 
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         msg.style.color = "green";
         msg.innerText = "Login successful!";
         setTimeout(() => {
-          window.location.href = "index.html"; // dashboard
-        }, 1000);
+          window.location.href = "dashboard.html";
+        }, 800);
       })
       .catch((error) => {
         msg.style.color = "red";
         msg.innerText = error.message;
       });
-  };
+  }
 
   // REGISTER
-  window.register = function () {
-    const email = email.value;
-    const password = password.value;
+  function register() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      msg.style.color = "red";
+      msg.innerText = "Please enter email and password";
+      return;
+    }
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
@@ -112,7 +129,7 @@ button.outline{
         msg.style.color = "red";
         msg.innerText = error.message;
       });
-  };
+  }
 </script>
 
 </body>
